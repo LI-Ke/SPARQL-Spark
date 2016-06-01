@@ -7,8 +7,8 @@ import org.apache.spark.HashPartitioner
 val NB_FRAGMENTS = sc.defaultParallelism
 val part =  sc.defaultParallelism 
 
-val directory = "/home/oliv/projets/lodAutomed/"
-val file = "drugbank_dump.nt"
+val directory = "/home/oliv/git/SPARQL-Spark/liteMat++/"
+val file = "drugBankExt.nt"
 
 // Load the Drugbank data set
 val triples0 = sc.textFile(directory+file).map(x=>x.split(" ")).map(t=>(t(0),t(1),t(2)))
@@ -38,7 +38,7 @@ val sameAsGroup = connectedComponents.vertices.map{x=> x._2}.distinct
 val nonSameAs = triples0.filter{case(s,p,o)=>p!="<http://www.w3.org/2002/07/owl#sameAs>"}.map{case(s,p,o)=>(s,o)}
 
 // create an RDD containing nonSameAs individuals
-val nonSameAsInd = nonSameAs.flatMap{case(s,o)=>Array(s,o)}.distinct
+val nonSameAsInd = nonSameAs.flatMap{case(s,o)=>Array(s,o)}.distinct.subtract(sameAsInd)
 
 // number of bits required for the encoding of sameAs individuals
 val nonSameAsBit = (Math.log(nonSameAsInd.count*2)/Math.log(2)).ceil
@@ -46,6 +46,43 @@ val nonSameAsBit = (Math.log(nonSameAsInd.count*2)/Math.log(2)).ceil
 val nonSameAsDictionary = nonSameAsInd.zipWithUniqueId
 
 // number of bits required for the encoding of sameAs individuals
-val sameAsBit = 1 + nonSameAsBit + (Math.log(sameAsGroup.count*2)/Math.log(2)).ceil
+val sameAsBit = (Math.log(sameAsGroup.count*2)/Math.log(2)).ceil
+
+///////////////////////////////////////////
+// Encode sameAsIndividuals
+
+// create an RDD containing the connected component id and an array of all URI in that individual cluster
+val sameAsURIConnectedComp = sameAsIndId.map(x=>(x._2,x._1)).join(connectedComponents.vertices.map(x=>x)).map{case(k,(uri,cid))=>(cid,uri)}.groupByKey
+
+def zipId(map : Iterable[String] ) : List[(Long,String)] = {
+  var res = ListBuffer[(Long,String)]()
+  var cumul : Long = 1;
+  var i = map.iterator
+  while (i.hasNext) {
+    res.append((cumul,i.next))
+    cumul = cumul + 1
+  }
+  return res.toList
+}
+
+def zipId(map : Iterable[String] ) : List[(Long,String)] = {
+  var res = ListBuffer[(Long,String)]()
+  var cumul : Long = 1;
+  var i = map.iterator
+  while (i.hasNext) {
+    res.append((cumul,i.next))
+    cumul = cumul + 1
+  }
+  return res.toList
+}
+
+val sameAsDictionaryTemp = sameAsURIConnectedComp.map{case(id, l)=> (id, zipId(l))}.flatMap{case(cid, list) => list.map{case(id, u)=> (cid.toLong,id,u)}}
+
+def dicoRDD(saBit : Long, nonsaBit: Long, rdd : RDD[(Long, Long, String)]) : RDD[(Long, String)] = {
+    return rdd.map{case(cid,id,uri) => (1<<(saBit+nonsaBit) | (cid<<nonsaBit) + id, uri)}
+}
+
+val sameAsDictionary = dicoRDD(sameAsBit.toLong, nonSameAsBit.toLong, sameAsDictionaryTemp)
+
 
 
