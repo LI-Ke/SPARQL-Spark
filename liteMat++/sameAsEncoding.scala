@@ -1,5 +1,6 @@
 import org.apache.spark.graphx.Edge 
 import org.apache.spark.graphx.Graph
+import org.apache.spark.rdd.RDD
 
 import scala.collection.mutable.ListBuffer
 import org.apache.spark.HashPartitioner
@@ -83,6 +84,10 @@ def dicoRDD(saBit : Long, nonsaBit: Long, rdd : RDD[(Long, Long, String)]) : RDD
 }
 
 val sameAsDictionary = dicoRDD(sameAsBit.toLong, nonSameAsBit.toLong, sameAsDictionaryTemp)
+
+// store dictionaries
+nonSameAsDictionary.map(x=> x._2+" "+x._1).saveAsTextFile(file+"_nonSameAs.dic")
+sameAsDictionary.map(x=>x._1+" "+x._2).saveAsTextFile(file+"_sameAs.dic")
 
 
 
