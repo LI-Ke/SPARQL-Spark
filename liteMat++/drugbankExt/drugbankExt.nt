@@ -11,3 +11,11 @@
 <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00793> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Mycilan" .
 <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00793> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Polik" .
 <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00793> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/atcCode> "D01AE11" .
+<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00234> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Prolift" .
+<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00234> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Solvex" .
+<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00234> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Vestra" .
+<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00257> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Trimysten" .
+<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00257> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Trivagizole 3" .
+<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00257> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Veltrim" .
+<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00257> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/atcCode> "D01AC01" .
+<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00234> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget> <http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/3452> .

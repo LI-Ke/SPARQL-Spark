@@ -86,8 +86,8 @@ def dicoRDD(saBit : Long, nonsaBit: Long, rdd : RDD[(Long, Long, String)]) : RDD
 val sameAsDictionary = dicoRDD(sameAsBit.toLong, nonSameAsBit.toLong, sameAsDictionaryTemp)
 
 // store dictionaries
-nonSameAsDictionary.map(x=> x._2+" "+x._1).saveAsTextFile(directory+"/dct/"+file+"_nonSameAs.dct")
-sameAsDictionary.map(x=>x._1+" "+x._2).saveAsTextFile(directory+"/dct/"+file+"_sameAs.dct")
+nonSameAsDictionary.map(x=> x._2+" "+x._1).saveAsTextFile(nonSameAs.dct")
+sameAsDictionary.map(x=>x._1+" "+x._2).saveAsTextFile(sameAs.dct")
 
 
 
