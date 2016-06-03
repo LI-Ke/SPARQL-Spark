@@ -1,0 +1,8 @@
+ASK {<http://www.dbpedia.org/resource/Clotrimazole> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Veltrim" .}
+// ASK {?sa1  <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Veltrim" . FILTER (?sa1>=160 && ?sa1<192}
+// ASK {?sa1 276 3. FILTER (?sa1>=160 && ?sa1<192}
+
+SELECT ?x WHERE {<http://www.dbpedia.org/resource/Clotrimazole> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?x .}
+
+SELECT ?x ?y WHERE {?x <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?x .}
+
