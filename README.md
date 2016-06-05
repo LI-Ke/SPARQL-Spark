@@ -4,7 +4,7 @@ This includes :
 - the distribution of the RDF data set
 - SPARQL query processing (using Spark SQL) 
 - inference over RDFS, RDFS++ and we hope more expressive ontology languages:
-   - using the LiteMat encoding scheme
+   - using the **LiteMat** encoding scheme
        - specific Abox encoding in LiteMat++ with:
 	 - sameAsEncoding.scala to provide identifiers for sameAs and nonSameAs individuals
 	 - aboxEncoding.scala to encode the Abox data set.
