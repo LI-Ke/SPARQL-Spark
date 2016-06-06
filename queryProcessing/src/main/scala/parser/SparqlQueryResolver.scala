@@ -13,7 +13,6 @@ class SparqlQueryResolver(queryStr: String) {
   val visitor: SparqlOpVisitor = SparqlOpVisitor("TEST")
 
   query.getTupleExpr.visit(visitor)
-   print(query.toString)
 
 }
 
