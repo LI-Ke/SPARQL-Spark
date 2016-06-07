@@ -30,7 +30,7 @@ var end= java.lang.System.currentTimeMillis();
 print("Duration Q1 ="+(end-start))
 
 //////////////////////////////////
-// Query 2 : SELECT ?x WHERE {<http://www.dbpedia.org/resource/Clotrimazole> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?x .}
+// Query 2 : SELECT ?x WHERE {<http://www.dbpedia.org/resource/Clotrimazole> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?y .}
 var start= java.lang.System.currentTimeMillis();
 val resQ2 = df.where(df("p")===276 && df("s")>=160 && df("s")<192).select("o")
 
