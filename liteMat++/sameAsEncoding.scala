@@ -55,6 +55,12 @@ val sameAsBit = (Math.log(sameAsGroup.count*2)/Math.log(2)).ceil
 // create an RDD containing the connected component id and an array of all URI in that individual cluster
 val sameAsURIConnectedComp = sameAsIndId.map(x=>(x._2,x._1)).join(connectedComponents.vertices.map(x=>x)).map{case(k,(uri,cid))=>(cid,uri)}.groupByKey
 
+// compute max number of members in a sameAsGroup
+val maxGroupSize = sameAsURIConnectedComp.map(x=> (x._2.size)).reduce(Math.max)
+
+// compute number of bits required for the largest sameAs group
+val maxGroupSizeBit = (Math.log(maxGroupSize)/math.log(2)).ceil
+
 def zipId(map : Iterable[String] ) : List[(Long,String)] = {
   var res = ListBuffer[(Long,String)]()
   var cumul : Long = 1;
@@ -83,11 +89,15 @@ def dicoRDD(saBit : Long, nonsaBit: Long, rdd : RDD[(Long, Long, String)]) : RDD
     return rdd.map{case(cid,id,uri) => (1<<(saBit+nonsaBit) | (cid<<nonsaBit) + id, uri)}
 }
 
-val sameAsDictionary = dicoRDD(sameAsBit.toLong, nonSameAsBit.toLong, sameAsDictionaryTemp)
+// compute the size required for right most part for the sameAs groups
+val rightSizeBit = Math.max(maxGroupSizeBit,nonSameAsBit.toLong)
+
+// compute de sameAsDictionary
+val sameAsDictionary = dicoRDD(sameAsBit.toLong, rightSizeBit.toLong, sameAsDictionaryTemp)
 
 // store dictionaries
 nonSameAsDictionary.map(x=> x._2+" "+x._1).saveAsTextFile(directory+"/dct/"+file+"_nonSameAs.dct")
 sameAsDictionary.map(x=>x._1+" "+x._2).saveAsTextFile(directory+"/dct/"+file+"_sameAs.dct")
-
+sc.parallelize(Array(1+sameAsBit.toLong)).saveAsTextFile(directory+"/dct/metadata")
 
 
