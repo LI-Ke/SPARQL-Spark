@@ -23,12 +23,12 @@ class Dictionaries(sc : SparkContext, directory : String) {
 
     val properties = sc.textFile(directory+"/dct/properties.dct").map(x=>x.split(" "))
     val propertiesId2URI = properties.map(x=>(x(1),x(0),x(2)))
-    propertiesId2URI.persist
-    propertiesId2URI.count
+    conceptsId2URI.persist
+    conceptsId2URI.count
 
     val propertiesURI2Id = properties.map(x=>(x(0),x(1)))
-    propertiesURI2Id.persist
-    propertiesURI2Id.count
+    conceptsURI2Id.persist
+    conceptsURI2Id.count
 
     val sameAs = sc.textFile(directory+"/dct/sameAs.dct").map(x=>x.split(" "))
     val sameAsId2URI = sameAs.map(x=>(x(0),x(1)))

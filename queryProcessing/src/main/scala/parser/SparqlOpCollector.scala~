@@ -54,7 +54,7 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
     }
     if(sp.getSubjectVar.hasValue) {
         var subject = sp.getSubjectVar.getValue.stringValue
-        if(subject.trim.startsWith("http"))
+        if(subject.trim.startsWith("<"))
           subject = "<"+subject+">"
            
 	val idS = dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(subject)

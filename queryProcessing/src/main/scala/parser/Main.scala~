@@ -3,7 +3,7 @@ package parser
 object Main extends App {
   println("start")
   //val qr = "SELECT ?x ?z1 WHERE {<http://www.dbpedia.org/resource/Clotrimazole> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?x. ?x <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?y. ?x <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?z. ?x <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?z1. ?y <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?z. ?y <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?z2. ?y <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?z3.}"
-  val qr = "SELECT ?x WHERE {<http://www.dbpedia.org/resource/Clotrimazole> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?x. ?x <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> \"Veltrim\" .}"
+  val qr = "SELECT ?x WHERE {<http://www.dbpedia.org/resource/Clotrimazole> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> ?x. ?x <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/brandName> "Veltrim" .}
 
   val directory = "/home/oliv/git/SPARQL-Spark/liteMat++/drugbankExt/"
 
