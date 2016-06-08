@@ -36,7 +36,7 @@ val connectedComponents = sameAsGraph.connectedComponents
 val sameAsGroup = connectedComponents.vertices.map{x=> x._2}.distinct
 
 // create an RDD made of statements where the property is not owl:sameAs
-val nonSameAs = triples0.filter{case(s,p,o)=>p!="<http://www.w3.org/2002/07/owl#sameAs>"}.map{case(s,p,o)=>(s,o)}
+val nonSameAs = triples0.filter{case(s,p,o)=>p!="<http://www.w3.org/2002/07/owl#sameAs>"}.map{case(s,p,o)=>(s,o.replace('\"',' ').trim)}
 
 // create an RDD containing nonSameAs individuals
 val nonSameAsInd = nonSameAs.flatMap{case(s,o)=>Array(s,o)}.distinct.subtract(sameAsInd)
@@ -96,8 +96,8 @@ val rightSizeBit = Math.max(maxGroupSizeBit,nonSameAsBit.toLong)
 val sameAsDictionary = dicoRDD(sameAsBit.toLong, rightSizeBit.toLong, sameAsDictionaryTemp)
 
 // store dictionaries
-nonSameAsDictionary.map(x=> x._2+" "+x._1).saveAsTextFile(directory+"/dct/"+file+"_nonSameAs.dct")
-sameAsDictionary.map(x=>x._1+" "+x._2).saveAsTextFile(directory+"/dct/"+file+"_sameAs.dct")
+nonSameAsDictionary.map(x=> x._2+" "+x._1).saveAsTextFile(directory+"/dct/nonSameAs.dct")
+sameAsDictionary.map(x=>x._1+" "+x._2).saveAsTextFile(directory+"/dct/sameAs.dct")
 sc.parallelize(Array(1+sameAsBit.toLong)).saveAsTextFile(directory+"/dct/metadata")
 
 
