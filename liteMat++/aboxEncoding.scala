@@ -12,7 +12,7 @@ val concepts = sc.textFile(directory+"/dct/concepts.dct").map(x=>x.split(" "))
 val conceptsId2URI = concepts.map(x=>(x(1),x(0),x(2)))
 conceptsId2URI.persist
 val conceptsURI2Id = concepts.map(x=>(x(0),x(1)))
-conceptsURI2Id.persits
+conceptsURI2Id.persist
 
 val properties = sc.textFile(directory+"/dct/properties.dct").map(x=>x.split(" "))
 val propertiesId2URI = properties.map(x=>(x(1),"<"+x(0)+">",x(2)))
