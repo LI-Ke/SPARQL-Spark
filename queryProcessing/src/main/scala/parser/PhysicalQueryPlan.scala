@@ -66,7 +66,7 @@ object QueryPhysicalPlan {
 
       for {i <- columnsName2 if columnsName1 contains i} joinKey.append(i)
 
-      dfLeft.join(dfRight, joinKey, joinType)
+      dfLeft //.join(dfRight, joinKey, joinType)
     }
   }
 

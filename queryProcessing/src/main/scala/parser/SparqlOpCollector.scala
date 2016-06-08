@@ -6,7 +6,7 @@ import scala.collection.mutable
 /**
   * Created by xiangnanren on 17/05/16.
   */
-class SparqlOpCollector(visitor: SparqlOpVisitor) {
+class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
 
   val opMap = new mutable.LinkedHashMap[StatementPattern, String]
   val opProjects = new mutable.ArrayBuffer[ProjectionElem]
@@ -15,13 +15,13 @@ class SparqlOpCollector(visitor: SparqlOpVisitor) {
   val predicates = new mutable.ArrayBuffer[Var]
   val varWeightMap = new mutable.LinkedHashMap[String, Int]
 
-  private var opId: Int = -1
+  private var opId: Int = 0
 
   visitor.projects.foreach(x => {
     println("var = "+x);initOpProjects(x); projectsWeight(x)
   })
   visitor.statementPatterns.foreach(x => {
-    println("pred stt="+x.getPredicateVar.hasValue); initPredicates(x); initOpSPsMap(x); spsWeight(x)
+    println("pred stt="+x.getPredicateVar.getValue); initPredicates(x); initOpSPsMap(x); spsWeight(x)
   })
   varWeightMap.retain((key, value) => value >= 2)
 
@@ -39,12 +39,16 @@ class SparqlOpCollector(visitor: SparqlOpVisitor) {
   }
 
   def initPredicates(sp: StatementPattern) = {
-    if (sp.getPredicateVar.hasValue) predicates.append(sp.getPredicateVar)
+    if (sp.getPredicateVar.hasValue) {
+        val id =   dictionaries.propertiesURI2Id.lookup(sp.getPredicateVar.getValue.toString)
+        println(" id == "+id.apply(0))
+        predicates.append(sp.getPredicateVar)
+    }
   }
 
   def initOpSPsMap(sp: StatementPattern) = {
-    opId += 1
     opSPMap.put(sp, opId)
+    opId += 1
   }
 
   def spsWeight(sp: StatementPattern) = {
@@ -66,6 +70,6 @@ class SparqlOpCollector(visitor: SparqlOpVisitor) {
 }
 
 object SparqlOpCollector {
-  def apply(visitor: SparqlOpVisitor): SparqlOpCollector = new SparqlOpCollector(visitor)
+  def apply(visitor: SparqlOpVisitor, dictionaries : Dictionaries): SparqlOpCollector = new SparqlOpCollector(visitor, dictionaries)
 
 }
