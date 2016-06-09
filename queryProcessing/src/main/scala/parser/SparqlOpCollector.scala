@@ -42,26 +42,39 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
     var idP = -1L
     if (sp.getPredicateVar.hasValue) {
         idP =   dictionaries.propertiesURI2Id.lookup(sp.getPredicateVar.getValue.toString).apply(0).toLong
-        if (idP>0)
+        if (idP>=0) {
 	   sp.setPredicateVar(new Var(idP.toString))
+        }
     }
     if(sp.getObjectVar.hasValue) {
 	val idO = idP match {
 	    case 0 => dictionaries.conceptsURI2Id.lookup(sp.getObjectVar.getValue.stringValue)
 	    case _ => dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(sp.getObjectVar.getValue.stringValue)
 	}
-        println(sp.getObjectVar.getValue.toString+ " idO = "+idO)
+	sp.setObjectVar(new Var(idO.apply(0).toString))
     }
     if(sp.getSubjectVar.hasValue) {
         var subject = sp.getSubjectVar.getValue.stringValue
         if(subject.trim.startsWith("http"))
           subject = "<"+subject+">"
            
-	val idS = dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(subject)
-        println(subject+" idS = "+ idS)
+	val idS = dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(subject).apply(0).toString
+
+	sp.setSubjectVar(new Var(idS))
     }
     predicates.append(sp.getPredicateVar)
-  }
+
+    println("New statement = "+sp.toString)
+/*    if(sp.getSubjectVar.hasValue)
+       print(sp.getSubjectVar.getValue.stringValue+"\t")
+    else
+       print("Var\t")
+    print(sp.getPredicateVar.getValue.stringValue+"\t")
+    if(sp.getObjectVar.hasValue)
+       println(sp.getObjectVar.getValue.stringValue)
+    else
+       println("Var")
+*/  }
 
   def initOpSPsMap(sp: StatementPattern) = {
     opSPMap.put(sp, opId)
