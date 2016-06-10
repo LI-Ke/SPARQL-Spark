@@ -9,8 +9,11 @@ import org.apache.spark.broadcast.Broadcast
 
 class Dictionaries(sc : SparkContext, directory : String) {
 
-    val metadata = sc.textFile(directory+"/dct/metadata")
-    val sameAsEncodingBitLength = metadata.first
+    val metadata = sc.textFile(directory+"/dct/metadata").map(x=>x.split(" ")).map(x=>(x(0),x(1)))
+    val saGroupBits = metadata.lookup("saGroupBits").apply(0).toLong
+    val saLocalBits = metadata.lookup("saLocalBits").apply(0).toLong
+
+    val sameAsStartId = 1<< (saGroupBits+saLocalBits)
 
     val concepts = sc.textFile(directory+"/dct/concepts.dct").map(x=>x.split(" "))
     val conceptsId2URI = concepts.map(x=>(x(1),x(0),x(2)))
