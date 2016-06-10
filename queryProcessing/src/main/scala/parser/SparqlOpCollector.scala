@@ -65,16 +65,13 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
     predicates.append(sp.getPredicateVar)
 
     println("New statement = "+sp.toString)
-/*    if(sp.getSubjectVar.hasValue)
-       print(sp.getSubjectVar.getValue.stringValue+"\t")
-    else
-       print("Var\t")
-    print(sp.getPredicateVar.getValue.stringValue+"\t")
-    if(sp.getObjectVar.hasValue)
-       println(sp.getObjectVar.getValue.stringValue)
-    else
-       println("Var")
-*/  }
+    if(idS>=dictionaries.sameAsStartId) {
+       val boundBase = idS >> dictionaries.saLocalBits
+       val lowerBound = boundBase << dictionaries.saLocalBits
+       val upperBound = (boundBase +1) << dictionaries.saLocalBits
+       println(s"Subject becomes a variable and is associated to a filter : FILTER (?var>=$lowerBound && ?var<$upperBound)")
+    }
+  }
 
   def initOpSPsMap(sp: StatementPattern) = {
     opSPMap.put(sp, opId)
