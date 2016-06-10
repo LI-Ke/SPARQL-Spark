@@ -70,7 +70,7 @@ def zipId(map : Iterable[String] ) : List[(Long,String)] = {
     cumul = cumul + 1
   }
   return res.toList
-}
+}-
 
 def zipId(map : Iterable[String] ) : List[(Long,String)] = {
   var res = ListBuffer[(Long,String)]()
@@ -95,9 +95,12 @@ val rightSizeBit = Math.max(maxGroupSizeBit,nonSameAsBit.toLong)
 // compute de sameAsDictionary
 val sameAsDictionary = dicoRDD(sameAsBit.toLong, rightSizeBit.toLong, sameAsDictionaryTemp)
 
+// Create metadata RDD
+val metadata = sc.parallelize(Array(("saGroupBits",sameAsBit.toLong),("saLocalBits",rightSizeBit.toLong)))
+
 // store dictionaries
 nonSameAsDictionary.map(x=> x._2+" "+x._1).saveAsTextFile(directory+"/dct/nonSameAs.dct")
 sameAsDictionary.map(x=>x._1+" "+x._2).saveAsTextFile(directory+"/dct/sameAs.dct")
-sc.parallelize(Array(1+sameAsBit.toLong)).saveAsTextFile(directory+"/dct/metadata")
+metadata.saveAsTextFile(directory+"/dct/metadata")
 
 
