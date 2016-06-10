@@ -96,7 +96,7 @@ val rightSizeBit = Math.max(maxGroupSizeBit,nonSameAsBit.toLong)
 val sameAsDictionary = dicoRDD(sameAsBit.toLong, rightSizeBit.toLong, sameAsDictionaryTemp)
 
 // Create metadata RDD
-val metadata = sc.parallelize(Array(("saGroupBits",sameAsBit.toLong),("saLocalBits",rightSizeBit.toLong)))
+val metadata = sc.parallelize(Array(("saGroupBits "+sameAsBit.toLong),("saLocalBits "+rightSizeBit.toLong)))
 
 // store dictionaries
 nonSameAsDictionary.map(x=> x._2+" "+x._1).saveAsTextFile(directory+"/dct/nonSameAs.dct")
