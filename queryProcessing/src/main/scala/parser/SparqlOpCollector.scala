@@ -14,6 +14,8 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
 
   val predicates = new mutable.ArrayBuffer[Var]
   val varWeightMap = new mutable.LinkedHashMap[String, Int]
+  val sameAsVarPrefix = "sAsVar"
+  var sameAsVarCount = 1
 
   private var opId: Int = 0
 
@@ -21,7 +23,7 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
     println("var = "+x);initOpProjects(x); projectsWeight(x)
   })
   visitor.statementPatterns.foreach(x => {
-    initPredicates(x); initOpSPsMap(x); spsWeight(x)
+    val idP = processPredicate(x); processObject(x,idP); processSubject(x); println(x.toString); initOpSPsMap(x); spsWeight(x)
   })
   varWeightMap.retain((key, value) => value >= 2)
 
@@ -38,14 +40,18 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
     varWeightMap.put(project.getTargetName, 1)
   }
 
-  def initPredicates(sp: StatementPattern) = {
+  def processPredicate(sp: StatementPattern) = {
     var idP = -1L
     if (sp.getPredicateVar.hasValue) {
         idP =   dictionaries.propertiesURI2Id.lookup(sp.getPredicateVar.getValue.toString).apply(0).toLong
         if (idP>=0) {
 	   sp.setPredicateVar(new Var(idP.toString))
-        }
+        } 
     }
+    predicates.append(sp.getPredicateVar)
+    idP
+  }
+  def processObject(sp: StatementPattern, idP : Long) = {
     if(sp.getObjectVar.hasValue) {
 	val idO = idP match {
 	    case 0 => dictionaries.conceptsURI2Id.lookup(sp.getObjectVar.getValue.stringValue)
@@ -53,23 +59,27 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
 	}
 	sp.setObjectVar(new Var(idO.apply(0).toString))
     }
+  }
+  def processSubject(sp: StatementPattern) = {
     if(sp.getSubjectVar.hasValue) {
         var subject = sp.getSubjectVar.getValue.stringValue
         if(subject.trim.startsWith("http"))
           subject = "<"+subject+">"
            
-	val idS = dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(subject).apply(0).toString
-
-	sp.setSubjectVar(new Var(idS))
-    }
-    predicates.append(sp.getPredicateVar)
-
-    println("New statement = "+sp.toString)
-    if(idS>=dictionaries.sameAsStartId) {
-       val boundBase = idS >> dictionaries.saLocalBits
-       val lowerBound = boundBase << dictionaries.saLocalBits
-       val upperBound = (boundBase +1) << dictionaries.saLocalBits
-       println(s"Subject becomes a variable and is associated to a filter : FILTER (?var>=$lowerBound && ?var<$upperBound)")
+	val idS = dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(subject).apply(0).toInt
+ 
+        println("New statement = "+sp.toString)
+        if(idS>=dictionaries.sameAsStartId) {
+           val boundBase = idS >> dictionaries.saLocalBits
+           val lowerBound = boundBase << dictionaries.saLocalBits
+           val upperBound = (boundBase +1) << dictionaries.saLocalBits
+           println(s"Subject becomes a variable and is associated to a filter : FILTER (?var>=$lowerBound && ?var<$upperBound)")
+           println(s"Subject becomes a variable $sameAsVarPrefix$sameAsVarCount and is associated to a filter : FILTER (?var>=$lowerBound && ?var<$upperBound)")
+           sp.setSubjectVar(new Var(sameAsVarPrefix+""+sameAsVarCount))
+           sameAsVarCount = sameAsVarCount + 1
+       }
+       else
+           sp.setSubjectVar(new Var(idS.toString))
     }
   }
 
