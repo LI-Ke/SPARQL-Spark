@@ -13,6 +13,7 @@ object SparkContextResolver {
       .set("spark.kryoserializer.buffer", "24")
       .setAppName(this.getClass.getSimpleName).setMaster("local[*]")
     var sc:SparkContext = new SparkContext(sparkConf)
+    Logger.getRootLogger.setLevel(Level.WARN)
     sc
   }
 }
