@@ -3,9 +3,6 @@ import org.openrdf.query.algebra.{ProjectionElem, StatementPattern, Var}
 
 import scala.collection.mutable
 
-/**
-  * Created by xiangnanren on 17/05/16.
-  */
 class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
 
   val opMap = new mutable.LinkedHashMap[StatementPattern, String]
@@ -14,7 +11,8 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
 
   val predicates = new mutable.ArrayBuffer[Var]
   val varWeightMap = new mutable.LinkedHashMap[String, Int]
-  val sameAsVarPrefix = "sAsVar"
+  var sameAsMap = new mutable.HashMap[Long,(Var, Long, Long)]
+  val sameAsVarPrefix = "sAs"
   var sameAsVarCount = 1
 
   private var opId: Int = 0
@@ -23,8 +21,9 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
     println("var = "+x);initOpProjects(x); projectsWeight(x)
   })
   visitor.statementPatterns.foreach(x => {
-    val idP = processPredicate(x); processObject(x,idP); processSubject(x); println(x.toString); initOpSPsMap(x); spsWeight(x)
+    val idP = processPredicate(x); processObject(x,idP); processSubject(x); initOpSPsMap(x); spsWeight(x); println(x.toString)
   })
+  sameAsMap.foreach(println)
   varWeightMap.retain((key, value) => value >= 2)
 
 
@@ -53,34 +52,45 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
   }
   def processObject(sp: StatementPattern, idP : Long) = {
     if(sp.getObjectVar.hasValue) {
+	var obj = sp.getObjectVar.getValue.stringValue
+        if(obj.trim.startsWith("http"))
+            obj = "<"+obj+">"
 	val idO = idP match {
-	    case 0 => dictionaries.conceptsURI2Id.lookup(sp.getObjectVar.getValue.stringValue)
-	    case _ => dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(sp.getObjectVar.getValue.stringValue)
+	    case 0 => dictionaries.conceptsURI2Id.lookup(obj)
+	    case _ => dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(obj)
 	}
-	sp.setObjectVar(new Var(idO.apply(0).toString))
+	sp.setObjectVar(getVariable(idO.apply(0).toLong))
     }
   }
+
   def processSubject(sp: StatementPattern) = {
     if(sp.getSubjectVar.hasValue) {
         var subject = sp.getSubjectVar.getValue.stringValue
         if(subject.trim.startsWith("http"))
-          subject = "<"+subject+">"
-           
-	val idS = dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(subject).apply(0).toInt
- 
-        println("New statement = "+sp.toString)
-        if(idS>=dictionaries.sameAsStartId) {
-           val boundBase = idS >> dictionaries.saLocalBits
-           val lowerBound = boundBase << dictionaries.saLocalBits
-           val upperBound = (boundBase +1) << dictionaries.saLocalBits
-           println(s"Subject becomes a variable and is associated to a filter : FILTER (?var>=$lowerBound && ?var<$upperBound)")
-           println(s"Subject becomes a variable $sameAsVarPrefix$sameAsVarCount and is associated to a filter : FILTER (?var>=$lowerBound && ?var<$upperBound)")
-           sp.setSubjectVar(new Var(sameAsVarPrefix+""+sameAsVarCount))
-           sameAsVarCount = sameAsVarCount + 1
-       }
-       else
-           sp.setSubjectVar(new Var(idS.toString))
+            subject = "<"+subject+">"
+	val idS = dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(subject).apply(0).toLong
+        sp.setSubjectVar(getVariable(idS))
     }
+  }
+
+  def getVariable(id: Long) : Var = {
+      if(id>=dictionaries.sameAsStartId) {
+          if(sameAsMap.contains(id)) {
+	      sameAsMap.apply(id)._1
+          }
+	  else {
+ 	      val boundBase = id >> dictionaries.saLocalBits
+              val lowerBound = boundBase << dictionaries.saLocalBits
+              val upperBound = (boundBase +1) << dictionaries.saLocalBits
+              val tmpVar = new Var(sameAsVarPrefix+""+sameAsVarCount)
+              sameAsMap += (id -> (tmpVar,lowerBound.toLong, upperBound.toLong))
+      println(s"=====================> sameAsMap updated : $sameAsMap.toString")
+              sameAsVarCount = sameAsVarCount + 1
+              tmpVar
+	  }
+      }
+      else
+          new Var(id.toString)
   }
 
   def initOpSPsMap(sp: StatementPattern) = {
