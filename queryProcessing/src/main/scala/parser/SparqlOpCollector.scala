@@ -57,7 +57,7 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
             obj = "<"+obj+">"
 	val idO = idP match {
 	    case 0 => dictionaries.conceptsURI2Id.lookup(obj)
-	    case _ => dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(obj)
+	    case _ => dictionaries.sameAsURI2Id.union(dictionaries.nonSameAsURI2Id).lookup(objsma)
 	}
 	sp.setObjectVar(getVariable(idO.apply(0).toLong))
     }
@@ -84,7 +84,6 @@ class SparqlOpCollector(visitor: SparqlOpVisitor, dictionaries : Dictionaries) {
               val upperBound = (boundBase +1) << dictionaries.saLocalBits
               val tmpVar = new Var(sameAsVarPrefix+""+sameAsVarCount)
               sameAsMap += (id -> (tmpVar,lowerBound.toLong, upperBound.toLong))
-      println(s"=====================> sameAsMap updated : $sameAsMap.toString")
               sameAsVarCount = sameAsVarCount + 1
               tmpVar
 	  }
