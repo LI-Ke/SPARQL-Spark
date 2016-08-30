@@ -32,7 +32,7 @@ nonSameAsId2URI.persist
 val nonSameAsURI2Id = nonSameAs.map(x=>(x(1),x(0)))
 nonSameAsURI2Id.persist
 
-///////////////////////////
+/////////////////////////////
 // Encode Abox dataset
 
 // remove sameAs statements
