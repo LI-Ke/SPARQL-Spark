@@ -33,7 +33,7 @@ val nonSameAsURI2Id = nonSameAs.map(x=>(x(1),x(0)))
 nonSameAsURI2Id.persist
 
 /////////////////////////////
-// Encode Abox dataset
+// Encoding Abox dataset
 
 // remove sameAs statements
 val abox0 = triples.filter(x=>x._2!="<http://www.w3.org/2002/07/owl#sameAs>").map(x=>(x._2,(x._1,x._3)))
