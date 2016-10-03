@@ -70,19 +70,9 @@ def zipId(map : Iterable[String] ) : List[(Long,String)] = {
     cumul = cumul + 1
   }
   return res.toList
-}-
-
-def zipId(map : Iterable[String] ) : List[(Long,String)] = {
-  var res = ListBuffer[(Long,String)]()
-  var cumul : Long = 1;
-  var i = map.iterator
-  while (i.hasNext) {
-    res.append((cumul,i.next))
-    cumul = cumul + 1
-  }
-  return res.toList
 }
 
+// Signature : connectedComponent, sameAsId, sameAsLabel
 val sameAsDictionaryTemp = sameAsURIConnectedComp.map{case(id, l)=> (id, zipId(l))}.flatMap{case(cid, list) => list.map{case(id, u)=> (cid.toLong,id,u)}}
 
 def dicoRDD(saBit : Long, nonsaBit: Long, rdd : RDD[(Long, Long, String)]) : RDD[(Long, String)] = {
