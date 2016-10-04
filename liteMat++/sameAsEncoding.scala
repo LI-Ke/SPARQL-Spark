@@ -2,6 +2,9 @@ import org.apache.spark.graphx.Edge
 import org.apache.spark.graphx.Graph
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Dataset
+import org.apache.spark.sql.DataFrameWriter
+import org.slf4j.impl.StaticLoggerBinder
+
 
 import scala.collection.mutable.ListBuffer
 import org.apache.spark.HashPartitioner
@@ -60,11 +63,10 @@ def zipId(map : Iterable[String] ) : List[(Long,String)] = {
   return res.toList
 }
 
-val sameAsDictionary = temp.map{case(id, l)=> (id, zipId(l))}.flatMap{case(cid, list) => list.map{case(id, u)=> ((cid.toLong,id),u)}}
+val sameAsDictionary = temp.map{case(id, l)=> (id, zipId(l))}.flatMap{case(cid, list) => list.map{case(id, u)=> ((cid.toLong,id.toInt),u)}}
 
 val metadata = sc.parallelize(Array(nonSameAsLimit))
 
 // store dictionaries
-nonSameAsDictionary.map(x=> x._2+" "+x._1).saveAsTextFile(directory+"/dct/nonSameAs.dct")
-sameAsDictionary.map(x=>x._1+" "+x._2).saveAsTextFile(directory+"/dct/sameAs.dct")
+nonSameAsDictionary.union(sameAsDictionary).toDS..parquet(directory+"/dct/individuals.dct")
 metadata.saveAsTextFile(directory+"/dct/metadata")
