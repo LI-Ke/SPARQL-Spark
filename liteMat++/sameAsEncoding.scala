@@ -68,5 +68,5 @@ val sameAsDictionary = temp.map{case(id, l)=> (id, zipId(l))}.flatMap{case(cid, 
 val metadata = sc.parallelize(Array(nonSameAsLimit))
 
 // store dictionaries
-nonSameAsDictionary.union(sameAsDictionary).toDS..parquet(directory+"/dct/individuals.dct")
+nonSameAsDictionary.union(sameAsDictionary).toDS.write.parquet(directory+"/dct/individuals.dct")
 metadata.saveAsTextFile(directory+"/dct/metadata")
