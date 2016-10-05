@@ -31,7 +31,7 @@ val nonSameAs = triples0.filter{case(s,p,o)=>p!="<http://www.w3.org/2002/07/owl#
 val nonSameAsInd = nonSameAs.flatMap{case(s,o)=>Array(s,o)}.distinct.subtract(sameAsInd)
 
 // Create non SameAs Dictionary
-val nonSameAsDictionary = nonSameAsInd.zipWithUniqueId.map{case(member, id)=> ((id,0),member)}.toDS
+val nonSameAsDictionary = nonSameAsInd.zipWithUniqueId.map{case(member, id)=> ((id,0),member)}
 
 val nonSameAsLimit = nonSameAsDictionary.count * 2
 
@@ -68,5 +68,6 @@ val sameAsDictionary = temp.map{case(id, l)=> (id, zipId(l))}.flatMap{case(cid, 
 val metadata = sc.parallelize(Array(nonSameAsLimit))
 
 // store dictionaries
-nonSameAsDictionary.union(sameAsDictionary).toDS.write.parquet(directory+"/dct/individuals.dct")
-metadata.saveAsTextFile(directory+"/dct/metadata")
+nonSameAsDictionary.union(sameAsDictionary).map{case(id,ent)=>id._1+" "+id._2+" "+ent}.saveAsTextFile(directory+"/dct/individuals.dct") 
+// toDS.write.parquet(directory+"/dct/individuals.dct")
+metadata.map(x=>"sameAsStartsAt "+ x).saveAsTextFile(directory+"/dct/metadata")
